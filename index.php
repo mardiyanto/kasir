@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
+
 <?php include 'koneksi.php'; ?>
 
 <!DOCTYPE html>
@@ -21,7 +29,7 @@
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#transaksiModal">
         Tambah Transaksi
     </button>
-
+    <a href="logout.php" class="btn btn-danger">Logout</a>
     <!-- Tabel Data Produk -->
     <table class="table table-bordered mt-3">
         <thead>
@@ -173,35 +181,42 @@
 
     <!-- Tabel Data Transaksi -->
     <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>ID Transaksi</th>
-                <th>Nama Produk</th>
-                <th>Jumlah</th>
-                <th>Harga Satuan</th>
-                <th>Total Harga</th>
-                <th>Tanggal Transaksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $sql = "SELECT t.id_transaksi, p.nama_produk, t.jumlah, t.harga, t.total_harga, t.tanggal_transaksi 
-                    FROM transaksi t
-                    JOIN produk p ON t.id_produk = p.id_produk";
-            $result = $conn->query($sql);
-            while ($row = $result->fetch_assoc()) {
-            ?>
-            <tr>
-                <td><?php echo $row['id_transaksi']; ?></td>
-                <td><?php echo $row['nama_produk']; ?></td>
-                <td><?php echo $row['jumlah']; ?></td>
-                <td><?php echo $row['harga']; ?></td>
-                <td><?php echo $row['total_harga']; ?></td>
-                <td><?php echo $row['tanggal_transaksi']; ?></td>
-            </tr>
-            <?php } ?>
-        </tbody>
-    </table>
+    <thead>
+        <tr>
+            <th>ID Transaksi</th>
+            <th>Nama Produk</th>
+            <th>Jumlah</th>
+            <th>Harga Satuan</th>
+            <th>Total Harga</th>
+            <th>Tanggal Transaksi</th>
+            <th>Aksi</th> <!-- Kolom Aksi -->
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+    $sql = "SELECT t.id_transaksi, p.nama_produk, t.jumlah, t.harga, t.total_harga, t.tanggal_transaksi 
+            FROM transaksi t
+            JOIN produk p ON t.id_produk = p.id_produk";
+    $result = $conn->query($sql);
+    while ($row = $result->fetch_assoc()) {
+    ?>
+    <tr>
+        <td><?php echo $row['id_transaksi']; ?></td>
+        <td><?php echo $row['nama_produk']; ?></td>
+        <td><?php echo $row['jumlah']; ?></td>
+        <td><?php echo 'Rp ' . number_format($row['harga'], 0, ',', '.'); ?></td>
+        <td><?php echo 'Rp ' . number_format($row['total_harga'], 0, ',', '.'); ?></td>
+        <td><?php echo $row['tanggal_transaksi']; ?></td>
+        <td>
+            <a href="proses.php?action=edit&id=<?php echo $row['id_transaksi']; ?>" class="btn btn-primary btn-sm">Edit</a>
+            <a href="proses.php?action=delete&id=<?php echo $row['id_transaksi']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?');">Hapus</a>
+        </td>
+    </tr>
+    <?php } ?>
+    </tbody>
+</table>
+
+
 </div>
 
 <?php
